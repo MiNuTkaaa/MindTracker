@@ -27,8 +27,23 @@ function loadMyProgress() {
   `;
 }
 
-rateBtn.addEventListener('click', loadRateMyself);
-progressBtn.addEventListener('click', loadMyProgress);
+rateBtn.addEventListener('click', () => {
+  setActiveTab(rateBtn);
+  loadRateMyself();
+});
+
+progressBtn.addEventListener('click', () => {
+  setActiveTab(progressBtn);
+  loadMyProgress();
+});
+
+function setActiveTab(activeBtn) {
+  [rateBtn, progressBtn].forEach(btn => {
+    btn.classList.remove('bg-gray-700');
+  });
+  activeBtn.classList.add('bg-gray-700');
+}
+
 
 // Load default screen
 loadRateMyself();

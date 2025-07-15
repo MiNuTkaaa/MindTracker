@@ -15,10 +15,17 @@
   </main>
 
   <!-- Bottom Navigation -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 text-white flex justify-around p-4">
-    <button id="rateBtn" class="flex-1 text-center">Rate Myself</button>
-    <button id="progressBtn" class="flex-1 text-center">My Progress</button>
-  </nav>
+<nav class="fixed bottom-0 left-0 right-0 bg-gray-800 text-white flex justify-around border-t border-gray-700">
+  <button id="rateBtn" class="w-full py-3 flex flex-col items-center hover:bg-gray-700 transition-colors active:bg-gray-600">
+    <span class="text-xl">📝</span>
+    <span class="text-sm">Rate Myself</span>
+  </button>
+  <button id="progressBtn" class="w-full py-3 flex flex-col items-center hover:bg-gray-700 transition-colors active:bg-gray-600">
+    <span class="text-xl">📊</span>
+    <span class="text-sm">My Progress</span>
+  </button>
+</nav>
+
 
   <script src="script.js"></script>
 </body>
