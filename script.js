@@ -37,6 +37,5 @@ function loadMyProgress() {
   `;
 }
 
-// Initial screen setup
 setActiveTab(rateBtn);
 loadRateMyself();
