@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MindTracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+
+  <!-- Main content will be injected here -->
+  <main id="app" class="flex-grow overflow-y-auto">
+    <!-- We will dynamically load 'Rate Myself' or 'My Progress' screen here -->
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-gray-800 text-white flex justify-around p-4">
+    <button id="rateBtn" class="flex-1 text-center">Rate Myself</button>
+    <button id="progressBtn" class="flex-1 text-center">My Progress</button>
+  </nav>
+
+  <script src="script.js"></script>
+</body>
+</html>
