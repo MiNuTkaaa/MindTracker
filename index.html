@@ -5,33 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MindTracker</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #f2f3f5;
+      color: #2e3338;
+      font-family: system-ui, sans-serif;
+    }
+    .obsidian-shadow {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    }
+    .obsidian-border {
+      border-color: #d0d0d0;
+    }
+    .obsidian-bg {
+      background-color: #ffffff;
+    }
+    .active-tab {
+      color: #4a67ff;
+    }
+  </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+<body class="flex flex-col min-h-screen">
 
-  <!-- Main content will be injected here -->
-  <main id="app" class="flex-grow overflow-y-auto">
-    <!-- We will dynamically load 'Rate Myself' or 'My Progress' screen here -->
+  <!-- Main content area -->
+  <main id="app" class="flex-grow p-4 pb-24">
+    <!-- Content loaded from JS -->
   </main>
 
-  <!-- Bottom Navigation -->
-<nav class="fixed bottom-0 left-0 right-0 bg-gray-800 text-white flex justify-around border-t border-gray-700">
-  <button id="rateBtn" class="w-full py-3 flex flex-col items-center hover:bg-gray-700 transition-colors active:bg-gray-600">
-    <span class="text-xl">📝</span>
-    <span class="text-sm">Rate Myself</span>
-  </button>
-  <button id="progressBtn" class="w-full py-3 flex flex-col items-center hover:bg-gray-700 transition-colors active:bg-gray-600">
-    <span class="text-xl">📊</span>
-    <span class="text-sm">My Progress</span>
-  </button>
-</nav>
-
+  <!-- Fixed bottom navigation like an app -->
+  <nav class="fixed bottom-0 left-0 right-0 obsidian-bg border-t obsidian-border obsidian-shadow z-50">
+    <div class="flex justify-around text-sm">
+      <button id="rateBtn" class="w-full py-3 flex flex-col items-center transition-colors text-gray-600 hover:text-blue-600">
+        <span class="text-lg mb-1">📝</span>
+        <span class="text-xs">Rate Myself</span>
+      </button>
+      <button id="progressBtn" class="w-full py-3 flex flex-col items-center transition-colors text-gray-600 hover:text-blue-600">
+        <span class="text-lg mb-1">📊</span>
+        <span class="text-xs">My Progress</span>
+      </button>
+    </div>
+  </nav>
 
   <script src="script.js"></script>
-<!-- Modal Container -->
-<div id="modalContainer" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
-  <!-- Modal will be injected here -->
-</div>
-
 </body>
 </html>
