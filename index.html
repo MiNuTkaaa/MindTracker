@@ -1,51 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MindTracker</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f2f3f5;
-      color: #2e3338;
-      font-family: system-ui, sans-serif;
-    }
-    .obsidian-shadow {
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-    }
-    .obsidian-border {
-      border-color: #d0d0d0;
-    }
-    .obsidian-bg {
-      background-color: #ffffff;
-    }
-    .active-tab {
-      color: #4a67ff;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MindTracker</title>
+<style>
+  /* Basic reset */
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: system-ui, sans-serif;
+    background-color: #f2f3f5;
+    color: #2e3338;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1 1 auto;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #d0d0d0;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: color 0.3s;
+  }
+
+  nav button.active, nav button:hover {
+    color: #4a67ff;
+  }
+
+  nav button span.icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+</style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body>
 
-  <!-- Main app container with enough padding to avoid overlap with bottom nav -->
-  <main id="app" class="flex-grow px-4 pt-6 pb-28">
-    <!-- Injected via JS -->
-  </main>
+<main id="content">
+  <h1>Welcome</h1>
+  <p>Content area, scroll me if you want!</p>
+</main>
 
-  <!-- True bottom nav -->
-  <nav class="fixed bottom-0 left-0 right-0 obsidian-bg border-t obsidian-border obsidian-shadow z-50">
-    <div class="flex justify-around text-sm">
-      <button id="rateBtn" class="w-full py-3 flex flex-col items-center transition-colors text-gray-600 hover:text-blue-600">
-        <span class="text-lg mb-1">📝</span>
-        <span class="text-xs">Rate Myself</span>
-      </button>
-      <button id="progressBtn" class="w-full py-3 flex flex-col items-center transition-colors text-gray-600 hover:text-blue-600">
-        <span class="text-lg mb-1">📊</span>
-        <span class="text-xs">My Progress</span>
-      </button>
+<nav>
+  <button id="btnRate" class="active">
+    <span class="icon">📝</span>
+    Rate Myself
+  </button>
+  <button id="btnProgress">
+    <span class="icon">📊</span>
+    My Progress
+  </button>
+</nav>
+
+<!-- Modal Container -->
+<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); 
+  justify-content:center; align-items:center; z-index:1000; flex-direction: column;">
+  <div style="background:#fff; padding:20px; border-radius:8px; width:90%; max-width:400px; box-shadow:0 0 10px rgba(0,0,0,0.2);">
+    <h2 style="margin-top:0; margin-bottom:12px;">Create New Category</h2>
+    <label>
+      Category Name:<br/>
+      <input id="categoryName" type="text" style="width:100%; padding:8px; margin-top:4px; margin-bottom:12px; box-sizing:border-box;" />
+    </label>
+    <div style="margin-bottom:12px;">
+      Choose color:<br/>
+      <div id="colorOptions" style="display:flex; gap:10px; margin-top:6px;">
+        <div class="color-circle" data-color="#ef4444" style="background:#ef4444; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
+        <div class="color-circle" data-color="#f59e0b" style="background:#f59e0b; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
+        <div class="color-circle" data-color="#10b981" style="background:#10b981; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
+        <div class="color-circle" data-color="#3b82f6" style="background:#3b82f6; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
+        <div class="color-circle" data-color="#8b5cf6" style="background:#8b5cf6; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
+      </div>
     </div>
-  </nav>
+    <div style="text-align:right;">
+      <button id="cancelCategory" style="background:#ddd; border:none; padding:8px 16px; border-radius:5px; cursor:pointer; margin-right:8px;">Cancel</button>
+      <button id="saveCategory" style="background:#4a67ff; color:#fff; border:none; padding:8px 16px; border-radius:5px; cursor:pointer;">Save</button>
+    </div>
+  </div>
+</div>
 
-  <script src="script.js"></script>
+<script>
+  const btnRate = document.getElementById('btnRate');
+  const btnProgress = document.getElementById('btnProgress');
+  const content = document.getElementById('content');
+
+  btnRate.addEventListener('click', () => {
+    btnRate.classList.add('active');
+    btnProgress.classList.remove('active');
+    content.innerHTML = `
+      <h1>📝 Rate Myself</h1>
+      <button style="background:#4a67ff; color:white; border:none; border-radius:5px; padding:10px 20px; cursor:pointer;">
+        + Create a Category
+      </button>
+      <p style="margin-top:20px; color:#666;">No categories yet.</p>
+    `;
+  });
+
+  btnProgress.addEventListener('click', () => {
+    btnProgress.classList.add('active');
+    btnRate.classList.remove('active');
+    content.innerHTML = `
+      <h1>📊 My Progress</h1>
+      <button style="background:#22c55e; color:white; border:none; border-radius:5px; padding:10px 20px; cursor:pointer;">
+        📅 Record a Day
+      </button>
+      <p style="margin-top:20px; color:#666;">Charts will appear here.</p>
+    `;
+  });
+</script>
+
 </body>
 </html>
