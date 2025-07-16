@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MindTracker</title>
 <style>
-  /* Basic reset */
+  /* Reset + base */
   body, html {
     margin: 0;
     padding: 0;
@@ -34,6 +34,7 @@
     justify-content: space-around;
     padding: 10px 0;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    z-index: 100;
   }
 
   nav button {
@@ -57,13 +58,158 @@
     font-size: 20px;
     margin-bottom: 4px;
   }
+
+  /* Modal styles */
+  #modal, #pointModal, #gradingModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+  }
+
+  #modalContent, #pointModalContent, #gradingModalContent {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+
+  .color-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+
+  .color-circle.selected {
+    border-color: #000;
+  }
+
+  /* Category box */
+  .category-box {
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .category-header {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .category-color-circle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .category-toggle-arrow {
+    margin-left: auto;
+  }
+
+  .points-list {
+    padding: 0 16px 12px 42px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .point-item {
+    margin-bottom: 6px;
+  }
+
+  .btn-create-point {
+    margin-top: 8px;
+    background: #4a67ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  /* Grading modal styles */
+  .grading-category {
+    margin-bottom: 20px;
+  }
+
+  .grading-category-title {
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .grading-category-color {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .grading-point {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .grading-point-name {
+    font-size: 14px;
+  }
+
+  .grading-point-input {
+    width: 70px;
+  }
+
+  /* Buttons in modals */
+  .modal-buttons {
+    text-align: right;
+    margin-top: 16px;
+  }
+
+  .modal-buttons button {
+    background: #4a67ff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .modal-buttons button.cancel {
+    background: #ddd;
+    color: #333;
+    margin-right: 8px;
+  }
 </style>
 </head>
 <body>
 
 <main id="content">
-  <h1>Welcome</h1>
-  <p>Content area, scroll me if you want!</p>
+  <!-- Content will be rendered here -->
 </main>
 
 <nav>
@@ -77,10 +223,9 @@
   </button>
 </nav>
 
-<!-- Modal Container -->
-<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); 
-  justify-content:center; align-items:center; z-index:1000; flex-direction: column;">
-  <div style="background:#fff; padding:20px; border-radius:8px; width:90%; max-width:400px; box-shadow:0 0 10px rgba(0,0,0,0.2);">
+<!-- Category Modal -->
+<div id="modal">
+  <div id="modalContent">
     <h2 style="margin-top:0; margin-bottom:12px;">Create New Category</h2>
     <label>
       Category Name:<br/>
@@ -89,49 +234,329 @@
     <div style="margin-bottom:12px;">
       Choose color:<br/>
       <div id="colorOptions" style="display:flex; gap:10px; margin-top:6px;">
-        <div class="color-circle" data-color="#ef4444" style="background:#ef4444; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
-        <div class="color-circle" data-color="#f59e0b" style="background:#f59e0b; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
-        <div class="color-circle" data-color="#10b981" style="background:#10b981; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
-        <div class="color-circle" data-color="#3b82f6" style="background:#3b82f6; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
-        <div class="color-circle" data-color="#8b5cf6" style="background:#8b5cf6; width:24px; height:24px; border-radius:50%; cursor:pointer; border: 2px solid transparent;"></div>
+        <div class="color-circle" data-color="#ef4444" style="background:#ef4444;"></div>
+        <div class="color-circle" data-color="#f59e0b" style="background:#f59e0b;"></div>
+        <div class="color-circle" data-color="#10b981" style="background:#10b981;"></div>
+        <div class="color-circle" data-color="#3b82f6" style="background:#3b82f6;"></div>
+        <div class="color-circle" data-color="#8b5cf6" style="background:#8b5cf6;"></div>
       </div>
     </div>
-    <div style="text-align:right;">
-      <button id="cancelCategory" style="background:#ddd; border:none; padding:8px 16px; border-radius:5px; cursor:pointer; margin-right:8px;">Cancel</button>
-      <button id="saveCategory" style="background:#4a67ff; color:#fff; border:none; padding:8px 16px; border-radius:5px; cursor:pointer;">Save</button>
+    <div class="modal-buttons">
+      <button id="cancelCategory" class="cancel">Cancel</button>
+      <button id="saveCategory">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Point Modal -->
+<div id="pointModal">
+  <div id="pointModalContent">
+    <h2 style="margin-top:0; margin-bottom:12px;">Create New Point</h2>
+    <label>
+      Point Name:<br/>
+      <input id="pointName" type="text" style="width:100%; padding:8px; margin-top:4px; margin-bottom:12px; box-sizing:border-box;" />
+    </label>
+    <div class="modal-buttons">
+      <button id="cancelPoint" class="cancel">Cancel</button>
+      <button id="savePoint">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Grading Modal -->
+<div id="gradingModal">
+  <div id="gradingModalContent">
+    <h2 style="margin-top:0; margin-bottom:12px;">Record a Day</h2>
+    <label for="gradingDate" style="font-weight:600;">Date:</label>
+    <input type="date" id="gradingDate" style="width:100%; padding:8px; margin-bottom:16px; box-sizing:border-box;" />
+    <div id="gradingPointsContainer" style="max-height:60vh; overflow-y:auto;"></div>
+    <div class="modal-buttons" style="margin-top:16px;">
+      <button id="cancelGrading" class="cancel">Cancel</button>
+      <button id="saveGrading">Save</button>
     </div>
   </div>
 </div>
 
 <script>
+  const content = document.getElementById('content');
   const btnRate = document.getElementById('btnRate');
   const btnProgress = document.getElementById('btnProgress');
-  const content = document.getElementById('content');
 
-  btnRate.addEventListener('click', () => {
-    btnRate.classList.add('active');
-    btnProgress.classList.remove('active');
+  // Category modal elements
+  const modal = document.getElementById('modal');
+  const categoryNameInput = document.getElementById('categoryName');
+  const colorOptions = document.getElementById('colorOptions');
+  const cancelCategoryBtn = document.getElementById('cancelCategory');
+  const saveCategoryBtn = document.getElementById('saveCategory');
+
+  // Point modal elements
+  const pointModal = document.getElementById('pointModal');
+  const pointNameInput = document.getElementById('pointName');
+  const cancelPointBtn = document.getElementById('cancelPoint');
+  const savePointBtn = document.getElementById('savePoint');
+
+  // Grading modal elements
+  const gradingModal = document.getElementById('gradingModal');
+  const gradingDateInput = document.getElementById('gradingDate');
+  const gradingPointsContainer = document.getElementById('gradingPointsContainer');
+  const cancelGradingBtn = document.getElementById('cancelGrading');
+  const saveGradingBtn = document.getElementById('saveGrading');
+
+  let selectedColor = '#3b82f6'; // default color
+  let categories = [];
+  let pointCategoryId = null; // Which category is adding point
+
+  // Highlight color circle in category modal
+  function highlightSelectedColor() {
+    const circles = colorOptions.querySelectorAll('.color-circle');
+    circles.forEach(c => {
+      if (c.dataset.color === selectedColor) {
+        c.classList.add('selected');
+      } else {
+        c.classList.remove('selected');
+      }
+    });
+  }
+
+  colorOptions.querySelectorAll('.color-circle').forEach(circle => {
+    circle.addEventListener('click', () => {
+      selectedColor = circle.dataset.color;
+      highlightSelectedColor();
+    });
+  });
+
+  cancelCategoryBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  cancelPointBtn.addEventListener('click', () => {
+    pointModal.style.display = 'none';
+  });
+
+  cancelGradingBtn.addEventListener('click', () => {
+    gradingModal.style.display = 'none';
+  });
+
+  saveCategoryBtn.addEventListener('click', () => {
+    const name = categoryNameInput.value.trim();
+    if (!name) {
+      alert('Category name is required!');
+      return;
+    }
+    categories.push({ id: Date.now(), name, color: selectedColor, points: [], open: false });
+    modal.style.display = 'none';
+    renderCategories();
+  });
+
+  savePointBtn.addEventListener('click', () => {
+    const name = pointNameInput.value.trim();
+    if (!name) {
+      alert('Point name is required!');
+      return;
+    }
+    if (pointCategoryId === null) {
+      alert('Category not selected for point.');
+      return;
+    }
+    categories = categories.map(cat => {
+      if (cat.id === pointCategoryId) {
+        cat.points.push({ id: Date.now(), name });
+      }
+      return cat;
+    });
+    pointModal.style.display = 'none';
+    renderCategories();
+  });
+
+  // Open modals functions
+  function openCategoryModal() {
+    categoryNameInput.value = '';
+    selectedColor = '#3b82f6';
+    highlightSelectedColor();
+    modal.style.display = 'flex';
+  }
+
+  function openPointModal(catId) {
+    pointCategoryId = catId;
+    pointNameInput.value = '';
+    pointModal.style.display = 'flex';
+  }
+
+  function openGradingModal() {
+    if (categories.length === 0) {
+      alert('No categories or points created yet.');
+      return;
+    }
+
+    // Set default date today
+    gradingDateInput.value = new Date().toISOString().slice(0,10);
+
+    // Build grading form grouped by categories
+    gradingPointsContainer.innerHTML = categories.map(cat => {
+  if (cat.points.length === 0) return '';
+
+  return `
+    <div class="grading-category">
+      <div class="grading-category-title">
+        <span class="grading-category-color" style="background:${cat.color};"></span>
+        ${cat.name}
+      </div>
+      ${cat.points.map(point => {
+        const savedValue = getSavedGrade(gradingDateInput.value, cat.id, point.id) || 5;
+        const datalistId = `ticks-${cat.id}-${point.id}`;
+        return `
+          <div class="grading-point" data-cat-id="${cat.id}" data-point-id="${point.id}" style="margin-bottom:20px;">
+            <div class="grading-point-name" style="margin-bottom:6px; font-weight:500;">${point.name}</div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <input 
+                type="range" min="1" max="10" step="1" list="${datalistId}" 
+                value="${savedValue}" 
+                class="grading-slider" style="flex:1;" />
+              <span class="slider-value" style="width:24px; text-align:right;">${savedValue}</span>
+            </div>
+            <datalist id="${datalistId}">
+              ${Array.from({ length: 10 }, (_, i) => `<option value="${i + 1}"></option>`).join('')}
+            </datalist>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}).join('');
+
+    gradingModal.style.display = 'flex';
+  }
+
+// Attach live update handlers to sliders
+gradingPointsContainer.querySelectorAll('.grading-slider').forEach(slider => {
+  const valueDisplay = slider.parentElement.querySelector('.slider-value');
+  slider.addEventListener('input', () => {
+    valueDisplay.textContent = slider.value;
+  });
+});
+
+
+  // Save grades data in localStorage:
+  // Structure:
+  // {
+  //   "YYYY-MM-DD": {
+  //     "categoryId": {
+  //       "pointId": score (1-10)
+  //     }
+  //   }
+  // }
+  function saveGrades(date, gradesData) {
+    let allData = JSON.parse(localStorage.getItem('mindtracker-grades') || '{}');
+    allData[date] = gradesData;
+    localStorage.setItem('mindtracker-grades', JSON.stringify(allData));
+  }
+
+  // Load grades for date/category/point
+  function getSavedGrade(date, catId, pointId) {
+    let allData = JSON.parse(localStorage.getItem('mindtracker-grades') || '{}');
+    if (allData[date] && allData[date][catId] && allData[date][catId][pointId] != null) {
+      return allData[date][catId][pointId];
+    }
+    return null;
+  }
+
+  // Collect grades from inputs for given date
+  function collectGrades(date) {
+    let gradesData = {};
+    const pointsElems = gradingPointsContainer.querySelectorAll('.grading-point');
+    pointsElems.forEach(pointElem => {
+      const catId = pointElem.dataset.catId;
+      const pointId = pointElem.dataset.pointId;
+      const input = pointElem.querySelector('input');
+      const val = parseInt(input.value);
+      if (!gradesData[catId]) gradesData[catId] = {};
+      if (!isNaN(val) && val >= 1 && val <= 10) {
+        gradesData[catId][pointId] = val;
+      }
+    });
+    return gradesData;
+  }
+
+  saveGradingBtn.addEventListener('click', () => {
+    const date = gradingDateInput.value;
+    if (!date) {
+      alert('Please select a date.');
+      return;
+    }
+    const gradesData = collectGrades(date);
+    saveGrades(date, gradesData);
+    alert('Grades saved!');
+    gradingModal.style.display = 'none';
+  });
+
+  function renderRateMyself() {
     content.innerHTML = `
       <h1>📝 Rate Myself</h1>
-      <button style="background:#4a67ff; color:white; border:none; border-radius:5px; padding:10px 20px; cursor:pointer;">
+      <button id="createCategoryBtn" style="background:#4a67ff; color:white; border:none; border-radius:5px; padding:10px 20px; cursor:pointer; margin-bottom: 20px;">
         + Create a Category
       </button>
-      <p style="margin-top:20px; color:#666;">No categories yet.</p>
-    `;
-  });
-
-  btnProgress.addEventListener('click', () => {
-    btnProgress.classList.add('active');
-    btnRate.classList.remove('active');
-    content.innerHTML = `
-      <h1>📊 My Progress</h1>
-      <button style="background:#22c55e; color:white; border:none; border-radius:5px; padding:10px 20px; cursor:pointer;">
+      <button id="recordDayBtn" style="background:#22c55e; color:white; border:none; border-radius:5px; padding:10px 20px; cursor:pointer; margin-bottom: 20px;">
         📅 Record a Day
       </button>
+      <div id="categoriesList" style="margin-top:20px;"></div>
+    `;
+
+    document.getElementById('createCategoryBtn').addEventListener('click', openCategoryModal);
+    document.getElementById('recordDayBtn').addEventListener('click', openGradingModal);
+    renderCategories();
+  }
+
+  function renderMyProgress() {
+    content.innerHTML = `
+      <h1>📊 My Progress</h1>
       <p style="margin-top:20px; color:#666;">Charts will appear here.</p>
     `;
-  });
-</script>
+  }
 
-</body>
-</html>
+  function renderCategories() {
+    const container = document.getElementById('categoriesList');
+    if (!container) return;
+
+    container.innerHTML = categories.map(cat => `
+      <div class="category-box">
+        <button class="category-header" onclick="toggleCategory(${cat.id})">
+          <span class="category-color-circle" style="background:${cat.color};"></span>
+          ${cat.name}
+          <span class="category-toggle-arrow">${cat.open ? '▲' : '▼'}</span>
+        </button>
+        <div class="points-list" style="display:${cat.open ? 'block' : 'none'};">
+          ${cat.points.length === 0 ? 'No points yet.' : cat.points.map(p => `<div class="point-item">${p.name}</div>`).join('')}
+          ${cat.open ? `<button class="btn-create-point" onclick="openPointModal(${cat.id})">+ Create a Point</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Expose toggleCategory and openPointModal globally for inline onclick usage
+  window.toggleCategory = function(id) {
+    categories = categories.map(cat => {
+      if (cat.id === id) cat.open = !cat.open;
+return cat;
+});
+renderCategories();
+};
+
+window.openPointModal = openPointModal;
+
+// Nav buttons event handlers
+btnRate.addEventListener('click', () => {
+btnRate.classList.add('active');
+btnProgress.classList.remove('active');
+renderRateMyself();
+});
+
+btnProgress.addEventListener('click', () => {
+btnProgress.classList.add('active');
+btnRate.classList.remove('active');
+renderMyProgress();
+});
+
+// Initialize app on load
+btnRate.click();
+</script>
+</body> </html> ```
