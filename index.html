@@ -204,6 +204,50 @@
     color: #333;
     margin-right: 8px;
   }
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.grading-slider {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.slider-value-floating {
+  position: absolute;
+  top: -30px;
+  transform: translateX(-50%);
+  background: #4a67ff;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  padding: 0 2px;
+}
+
+.grading-point-name {
+  text-align: left;
+  width: 100%;
+  font-size: 14px;
+}
+
 </style>
 </head>
 <body>
@@ -434,7 +478,6 @@ gradingPointsContainer.querySelectorAll('.grading-slider').forEach(slider => {
     valueDisplay.textContent = slider.value;
   });
 });
-
 
   // Save grades data in localStorage:
   // Structure:

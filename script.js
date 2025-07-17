@@ -11,6 +11,12 @@ const saveCategoryBtn = document.getElementById('saveCategory');
 let selectedColor = '#3b82f6'; // default color
 let categories = [];
 
+const saved = localStorage.getItem('mindTrackerCategories');
+if (saved) {
+  categories = JSON.parse(saved);
+}
+
+
 function renderRateMyself() {
   content.innerHTML = `
     <h1>📝 Rate Myself</h1>
@@ -74,8 +80,8 @@ saveCategoryBtn.addEventListener('click', () => {
     alert('Category name is required!');
     return;
   }
-  // Add new category
   categories.push({ id: Date.now(), name, color: selectedColor, points: [], open: false });
+  saveToLocalStorage(); // <- add this
   closeModal();
   renderCategories();
 });
@@ -107,6 +113,7 @@ window.toggleCategory = function(id) {
     if (cat.id === id) cat.open = !cat.open;
     return cat;
   });
+  saveToLocalStorage(); // <- add this
   renderCategories();
 };
 
@@ -122,6 +129,11 @@ btnProgress.addEventListener('click', () => {
   btnRate.classList.remove('active');
   renderMyProgress();
 });
+
+function saveToLocalStorage() {
+  localStorage.setItem('mindTrackerCategories', JSON.stringify(categories));
+}
+
 
 // Initialize app on load
 btnRate.click();
