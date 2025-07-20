@@ -1,605 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MindTracker</title>
-<style>
-  /* Reset + base */
-  body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: system-ui, sans-serif;
-    background-color: #f2f3f5;
-    color: #2e3338;
-    display: flex;
-    flex-direction: column;
-  }
-
-  main {
-    flex: 1 1 auto;
-    padding: 20px;
-    overflow-y: auto;
-  }
-
-  nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    border-top: 1px solid #d0d0d0;
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-    z-index: 100;
-  }
-
-  nav button {
-    background: none;
-    border: none;
-    color: #666;
-    font-size: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: color 0.3s;
-  }
-
-  nav button.active, nav button:hover {
-    color: #4a67ff;
-  }
-
-  nav button span.icon {
-    font-size: 20px;
-    margin-bottom: 4px;
-  }
-
-  /* Modal styles */
-  #modal, #pointModal, #gradingModal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 1000;
-  }
-
-  #modalContent, #pointModalContent, #gradingModalContent {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 480px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  }
-
-  .color-circle {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent;
-  }
-
-  .color-circle.selected {
-    border-color: #000;
-  }
-
-  /* Category box */
-  .category-box {
-    border: 1px solid #d0d0d0;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  }
-
-  .category-header {
-    width: 100%;
-    text-align: left;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .category-color-circle {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-
-  .category-toggle-arrow {
-    margin-left: auto;
-  }
-
-  .points-list {
-    padding: 0 16px 12px 42px;
-    color: #666;
-    font-size: 14px;
-  }
-
-  .point-item {
-    margin-bottom: 6px;
-  }
-
-  .btn-create-point {
-    margin-top: 8px;
-    background: #4a67ff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  /* Grading modal styles */
-  .grading-category {
-    margin-bottom: 20px;
-  }
-
-  .grading-category-title {
-    font-weight: 700;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .grading-category-color {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-
-  .grading-point {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-
-  .grading-point-name {
-    font-size: 14px;
-  }
-
-  .grading-point-input {
-    width: 70px;
-  }
-
-  /* Buttons in modals */
-  .modal-buttons {
-    text-align: right;
-    margin-top: 16px;
-  }
-
-  .modal-buttons button {
-    background: #4a67ff;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  .modal-buttons button.cancel {
-    background: #ddd;
-    color: #333;
-    margin-right: 8px;
-  }
-
-.slider-container {
-  position: relative;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 28px;
-}
-
-.grading-slider {
-  width: 100%;
-  margin-top: 12px;
-}
-
-.slider-value-floating {
-  position: absolute;
-  top: -30px;
-  transform: translateX(-50%);
-  background: #4a67ff;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  pointer-events: none;
-  white-space: nowrap;
-}
-
-.slider-labels {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-  padding: 0 2px;
-}
-
-.grading-point-name {
-  text-align: left;
-  width: 100%;
-  font-size: 14px;
-}
-
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindTracker</title>
+  <style>
+    #createCategoryBtn:hover {
+      background: #3d55d4;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background-color: #1e1e1e;
+      color: #f7f7f7;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    #content {
+      padding: 16px;
+      margin-bottom: 80px;
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background: #2c2c2c;
+      border-top: 1px solid #444;
+    }
+    .bottom-nav button {
+      flex: 1;
+      padding: 16px;
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .bottom-nav button.active {
+      color: #ffffff;
+      font-weight: bold;
+      border-top: 2px solid #4a67ff;
+    }
+    .category-card {
+      background: #2a2a2a;
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .slider-container {
+      margin: 10px 0;
+    }
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #aaa;
+    }
+    input[type="range"] {
+      width: 100%;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+    }
+    .color-circle {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin-right: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #4a67ff;
+      color: white;
+    }
+    .btn-secondary {
+      background: #444;
+      color: white;
+    }
+  </style>
 </head>
 <body>
+  <header>MindTracker</header>
+  <div id="content"></div>
+<div style="text-align:center; margin-top: 20px;">
+  <button id="togglePastRatingsBtn" style="
+        display: none;
+        background: #4a67ff;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: background 0.3s ease;
+        margin-bottom: 16px;
+  ">📊 View Past Ratings</button>
+</div>
 
-<main id="content">
-  <!-- Content will be rendered here -->
-</main>
+<div id="pastRatingsDisplay" style="display: none; margin-top: 20px; color: #fff;"></div>
 
-<nav>
-  <button id="btnRate" class="active">
-    <span class="icon">📝</span>
-    Rate Myself
-  </button>
-  <button id="btnProgress">
-    <span class="icon">📊</span>
-    My Progress
-  </button>
-</nav>
+  <div class="bottom-nav">
+    <button id="btnRate" class="active">Rate Myself</button>
+    <button id="btnProgress">My Progress</button>
+  </div>
 
-<!-- Category Modal -->
-<div id="modal">
-  <div id="modalContent">
-    <h2 style="margin-top:0; margin-bottom:12px;">Create New Category</h2>
-    <label>
-      Category Name:<br/>
-      <input id="categoryName" type="text" style="width:100%; padding:8px; margin-top:4px; margin-bottom:12px; box-sizing:border-box;" />
-    </label>
-    <div style="margin-bottom:12px;">
-      Choose color:<br/>
-      <div id="colorOptions" style="display:flex; gap:10px; margin-top:6px;">
+  <!-- Modal -->
+<div id="modal" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+">
+  <div style="
+    background: #1e1e2e;
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    color: #f7f7ff;
+  ">
+    <h2 style="margin-bottom: 16px;">Create a New Category</h2>
+    <div style="margin-bottom: 16px; display: flex; justify-content: center;">
+  <input
+    type="text"
+    id="categoryName"
+    placeholder="Category name"
+    style="
+      width: 80%;
+      padding: 8px 12px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #2a2a3c;
+      color: #f7f7ff;
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+    "
+  />
+</div>
+
+
+    <div style="margin-bottom: 16px;">
+      <label style="display:block; margin-bottom: 8px;">Choose a color:</label>
+      <div id="colorOptions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="color-circle" data-color="#4a67ff" style="background:#4a67ff;"></div>
+        <div class="color-circle" data-color="#22c55e" style="background:#22c55e;"></div>
         <div class="color-circle" data-color="#ef4444" style="background:#ef4444;"></div>
-        <div class="color-circle" data-color="#f59e0b" style="background:#f59e0b;"></div>
-        <div class="color-circle" data-color="#10b981" style="background:#10b981;"></div>
-        <div class="color-circle" data-color="#3b82f6" style="background:#3b82f6;"></div>
-        <div class="color-circle" data-color="#8b5cf6" style="background:#8b5cf6;"></div>
+        <div class="color-circle" data-color="#eab308" style="background:#eab308;"></div>
+        <div class="color-circle" data-color="#14b8a6" style="background:#14b8a6;"></div>
       </div>
     </div>
-    <div class="modal-buttons">
-      <button id="cancelCategory" class="cancel">Cancel</button>
-      <button id="saveCategory">Save</button>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button id="cancelCategory" style="
+        background: #444;
+        color: white;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      ">Cancel</button>
+
+      <button id="saveCategory" style="
+        background: #4a67ff;
+        color: white;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+      ">Save</button>
     </div>
   </div>
 </div>
+
+
 
 <!-- Point Modal -->
-<div id="pointModal">
-  <div id="pointModalContent">
-    <h2 style="margin-top:0; margin-bottom:12px;">Create New Point</h2>
-    <label>
-      Point Name:<br/>
-      <input id="pointName" type="text" style="width:100%; padding:8px; margin-top:4px; margin-bottom:12px; box-sizing:border-box;" />
-    </label>
-    <div class="modal-buttons">
-      <button id="cancelPoint" class="cancel">Cancel</button>
-      <button id="savePoint">Save</button>
+<div id="pointModal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 1000; flex-direction: column;">
+  <div style="background: #222233; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; box-shadow: 0 0 12px rgba(0,0,0,0.5);">
+    <h2 style="color:#f7f7ff; margin-top:0; margin-bottom:12px;">Create New Point</h2>
+    <div style="margin-bottom: 16px; display: flex; justify-content: center;">
+      <input
+        type="text"
+        id="pointName"
+        placeholder="Point name"
+        style="
+          width: 80%;
+          padding: 8px 12px;
+          font-size: 15px;
+          border: none;
+          border-radius: 6px;
+          background: #2a2a3c;
+          color: #f7f7ff;
+          box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+        "
+      />
+    </div>
+    <div style="text-align: right;">
+      <button id="cancelPointBtn" style="margin-right: 10px; background: #888899; border:none; border-radius:6px; padding: 8px 16px; color:#f7f7ff; cursor:pointer;">Cancel</button>
+      <button id="savePointBtn" style="background: #3f51b5; border:none; border-radius:6px; padding: 8px 16px; color:#f7f7ff; cursor:pointer;">Save</button>
     </div>
   </div>
 </div>
 
-<!-- Grading Modal -->
-<div id="gradingModal">
-  <div id="gradingModalContent">
-    <h2 style="margin-top:0; margin-bottom:12px;">Record a Day</h2>
-    <label for="gradingDate" style="font-weight:600;">Date:</label>
-    <input type="date" id="gradingDate" style="width:100%; padding:8px; margin-bottom:16px; box-sizing:border-box;" />
-    <div id="gradingPointsContainer" style="max-height:60vh; overflow-y:auto;"></div>
-    <div class="modal-buttons" style="margin-top:16px;">
-      <button id="cancelGrading" class="cancel">Cancel</button>
-      <button id="saveGrading">Save</button>
-    </div>
+<!-- Record Day Modal -->
+<div id="recordDayModal" style="
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+">
+  <div style="
+    background: #1e1e1e;
+    padding: 24px;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 90%;
+    color: #fff;
+    font-family: system-ui, sans-serif;
+  ">
+    <h2 style="margin-bottom: 16px;">📅 Record a Day</h2>
+    <div id="recordDayContent" style="display: flex; flex-direction: column; gap: 16px;"></div>
+    <button onclick="submitRatings()" style="
+      margin-top: 20px;
+      background: #4a67ff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    ">Save</button>
+    <button onclick="closeRecordDayModal()" style="
+      margin-top: 10px;
+      background: transparent;
+      color: #ccc;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+    ">Cancel</button>
   </div>
 </div>
 
-<script>
-  const content = document.getElementById('content');
-  const btnRate = document.getElementById('btnRate');
-  const btnProgress = document.getElementById('btnProgress');
-
-  // Category modal elements
-  const modal = document.getElementById('modal');
-  const categoryNameInput = document.getElementById('categoryName');
-  const colorOptions = document.getElementById('colorOptions');
-  const cancelCategoryBtn = document.getElementById('cancelCategory');
-  const saveCategoryBtn = document.getElementById('saveCategory');
-
-  // Point modal elements
-  const pointModal = document.getElementById('pointModal');
-  const pointNameInput = document.getElementById('pointName');
-  const cancelPointBtn = document.getElementById('cancelPoint');
-  const savePointBtn = document.getElementById('savePoint');
-
-  // Grading modal elements
-  const gradingModal = document.getElementById('gradingModal');
-  const gradingDateInput = document.getElementById('gradingDate');
-  const gradingPointsContainer = document.getElementById('gradingPointsContainer');
-  const cancelGradingBtn = document.getElementById('cancelGrading');
-  const saveGradingBtn = document.getElementById('saveGrading');
-
-  let selectedColor = '#3b82f6'; // default color
-  let categories = [];
-  let pointCategoryId = null; // Which category is adding point
-
-  // Highlight color circle in category modal
-  function highlightSelectedColor() {
-    const circles = colorOptions.querySelectorAll('.color-circle');
-    circles.forEach(c => {
-      if (c.dataset.color === selectedColor) {
-        c.classList.add('selected');
-      } else {
-        c.classList.remove('selected');
-      }
-    });
-  }
-
-  colorOptions.querySelectorAll('.color-circle').forEach(circle => {
-    circle.addEventListener('click', () => {
-      selectedColor = circle.dataset.color;
-      highlightSelectedColor();
-    });
-  });
-
-  cancelCategoryBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-  });
-
-  cancelPointBtn.addEventListener('click', () => {
-    pointModal.style.display = 'none';
-  });
-
-  cancelGradingBtn.addEventListener('click', () => {
-    gradingModal.style.display = 'none';
-  });
-
-  saveCategoryBtn.addEventListener('click', () => {
-    const name = categoryNameInput.value.trim();
-    if (!name) {
-      alert('Category name is required!');
-      return;
-    }
-    categories.push({ id: Date.now(), name, color: selectedColor, points: [], open: false });
-    modal.style.display = 'none';
-    renderCategories();
-  });
-
-  savePointBtn.addEventListener('click', () => {
-    const name = pointNameInput.value.trim();
-    if (!name) {
-      alert('Point name is required!');
-      return;
-    }
-    if (pointCategoryId === null) {
-      alert('Category not selected for point.');
-      return;
-    }
-    categories = categories.map(cat => {
-      if (cat.id === pointCategoryId) {
-        cat.points.push({ id: Date.now(), name });
-      }
-      return cat;
-    });
-    pointModal.style.display = 'none';
-    renderCategories();
-  });
-
-  // Open modals functions
-  function openCategoryModal() {
-    categoryNameInput.value = '';
-    selectedColor = '#3b82f6';
-    highlightSelectedColor();
-    modal.style.display = 'flex';
-  }
-
-  function openPointModal(catId) {
-    pointCategoryId = catId;
-    pointNameInput.value = '';
-    pointModal.style.display = 'flex';
-  }
-
-  function openGradingModal() {
-    if (categories.length === 0) {
-      alert('No categories or points created yet.');
-      return;
-    }
-
-    // Set default date today
-    gradingDateInput.value = new Date().toISOString().slice(0,10);
-
-    // Build grading form grouped by categories
-    gradingPointsContainer.innerHTML = categories.map(cat => {
-  if (cat.points.length === 0) return '';
-
-  return `
-    <div class="grading-category">
-      <div class="grading-category-title">
-        <span class="grading-category-color" style="background:${cat.color};"></span>
-        ${cat.name}
-      </div>
-      ${cat.points.map(point => {
-        const savedValue = getSavedGrade(gradingDateInput.value, cat.id, point.id) || 5;
-        const datalistId = `ticks-${cat.id}-${point.id}`;
-        return `
-          <div class="grading-point" data-cat-id="${cat.id}" data-point-id="${point.id}" style="margin-bottom:20px;">
-            <div class="grading-point-name" style="margin-bottom:6px; font-weight:500;">${point.name}</div>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <input 
-                type="range" min="1" max="10" step="1" list="${datalistId}" 
-                value="${savedValue}" 
-                class="grading-slider" style="flex:1;" />
-              <span class="slider-value" style="width:24px; text-align:right;">${savedValue}</span>
-            </div>
-            <datalist id="${datalistId}">
-              ${Array.from({ length: 10 }, (_, i) => `<option value="${i + 1}"></option>`).join('')}
-            </datalist>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
-}).join('');
-
-    gradingModal.style.display = 'flex';
-  }
-
-// Attach live update handlers to sliders
-gradingPointsContainer.querySelectorAll('.grading-slider').forEach(slider => {
-  const valueDisplay = slider.parentElement.querySelector('.slider-value');
-  slider.addEventListener('input', () => {
-    valueDisplay.textContent = slider.value;
-  });
-});
-
-  // Save grades data in localStorage:
-  // Structure:
-  // {
-  //   "YYYY-MM-DD": {
-  //     "categoryId": {
-  //       "pointId": score (1-10)
-  //     }
-  //   }
-  // }
-  function saveGrades(date, gradesData) {
-    let allData = JSON.parse(localStorage.getItem('mindtracker-grades') || '{}');
-    allData[date] = gradesData;
-    localStorage.setItem('mindtracker-grades', JSON.stringify(allData));
-  }
-
-  // Load grades for date/category/point
-  function getSavedGrade(date, catId, pointId) {
-    let allData = JSON.parse(localStorage.getItem('mindtracker-grades') || '{}');
-    if (allData[date] && allData[date][catId] && allData[date][catId][pointId] != null) {
-      return allData[date][catId][pointId];
-    }
-    return null;
-  }
-
-  // Collect grades from inputs for given date
-  function collectGrades(date) {
-    let gradesData = {};
-    const pointsElems = gradingPointsContainer.querySelectorAll('.grading-point');
-    pointsElems.forEach(pointElem => {
-      const catId = pointElem.dataset.catId;
-      const pointId = pointElem.dataset.pointId;
-      const input = pointElem.querySelector('input');
-      const val = parseInt(input.value);
-      if (!gradesData[catId]) gradesData[catId] = {};
-      if (!isNaN(val) && val >= 1 && val <= 10) {
-        gradesData[catId][pointId] = val;
-      }
-    });
-    return gradesData;
-  }
-
-  saveGradingBtn.addEventListener('click', () => {
-    const date = gradingDateInput.value;
-    if (!date) {
-      alert('Please select a date.');
-      return;
-    }
-    const gradesData = collectGrades(date);
-    saveGrades(date, gradesData);
-    alert('Grades saved!');
-    gradingModal.style.display = 'none';
-  });
-
-  function renderRateMyself() {
-    content.innerHTML = `
-      <h1>📝 Rate Myself</h1>
-      <button id="createCategoryBtn" style="background:#4a67ff; color:white; border:none; border-radius:5px; padding:10px 20px; cursor:pointer; margin-bottom: 20px;">
-        + Create a Category
-      </button>
-      <button id="recordDayBtn" style="background:#22c55e; color:white; border:none; border-radius:5px; padding:10px 20px; cursor:pointer; margin-bottom: 20px;">
-        📅 Record a Day
-      </button>
-      <div id="categoriesList" style="margin-top:20px;"></div>
-    `;
-
-    document.getElementById('createCategoryBtn').addEventListener('click', openCategoryModal);
-    document.getElementById('recordDayBtn').addEventListener('click', openGradingModal);
-    renderCategories();
-  }
-
-  function renderMyProgress() {
-    content.innerHTML = `
-      <h1>📊 My Progress</h1>
-      <p style="margin-top:20px; color:#666;">Charts will appear here.</p>
-    `;
-  }
-
-  function renderCategories() {
-    const container = document.getElementById('categoriesList');
-    if (!container) return;
-
-    container.innerHTML = categories.map(cat => `
-      <div class="category-box">
-        <button class="category-header" onclick="toggleCategory(${cat.id})">
-          <span class="category-color-circle" style="background:${cat.color};"></span>
-          ${cat.name}
-          <span class="category-toggle-arrow">${cat.open ? '▲' : '▼'}</span>
-        </button>
-        <div class="points-list" style="display:${cat.open ? 'block' : 'none'};">
-          ${cat.points.length === 0 ? 'No points yet.' : cat.points.map(p => `<div class="point-item">${p.name}</div>`).join('')}
-          ${cat.open ? `<button class="btn-create-point" onclick="openPointModal(${cat.id})">+ Create a Point</button>` : ''}
-        </div>
-      </div>
-    `).join('');
-  }
-
-  // Expose toggleCategory and openPointModal globally for inline onclick usage
-  window.toggleCategory = function(id) {
-    categories = categories.map(cat => {
-      if (cat.id === id) cat.open = !cat.open;
-return cat;
-});
-renderCategories();
-};
-
-window.openPointModal = openPointModal;
-
-// Nav buttons event handlers
-btnRate.addEventListener('click', () => {
-btnRate.classList.add('active');
-btnProgress.classList.remove('active');
-renderRateMyself();
-});
-
-btnProgress.addEventListener('click', () => {
-btnProgress.classList.add('active');
-btnRate.classList.remove('active');
-renderMyProgress();
-});
-
-// Initialize app on load
-btnRate.click();
-</script>
-</body> </html> ```
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+  
+</body>
+</html>
